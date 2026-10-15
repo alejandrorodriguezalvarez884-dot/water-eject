@@ -1,6 +1,6 @@
 # Speaker Cleaner / Limpiar Altavoz
 
-App móvil (iOS y Android) que limpia el altavoz con sonido: expulsa el **agua** con un tono grave de 165 Hz (la técnica del bloqueo por agua del Apple Watch) y suelta el **polvo** con golpes de graves y barridos de frecuencia. Español e inglés según el idioma del dispositivo, nombre de la app incluido.
+App móvil (iOS y Android) que limpia el altavoz con sonido: expulsa el **agua** con un tono grave de 165 Hz y suelta el **polvo** con golpes de graves y barridos de frecuencia. Español e inglés según el idioma del dispositivo, nombre de la app incluido.
 
 ## Programas
 
@@ -21,7 +21,19 @@ npm install
 npx expo start          # escanea el QR con Expo Go
 npx expo start --web    # vista rápida en el navegador
 npx tsc --noEmit && npx expo lint
+npm test                # tests con jest-expo y React Native Testing Library
 ```
+
+### Probar en el simulador de iOS
+
+Hace falta Xcode y CocoaPods (`pod`). El proyecto nativo `ios/` se genera y no se sube al repo:
+
+```bash
+npx expo prebuild -p ios --clean
+npx expo run:ios --configuration Release   # o abre ios/SpeakerCleaner.xcworkspace en Xcode
+```
+
+`plugins/withSceneDelegate.js` hace que la app use el ciclo de vida de escenas (UIScene). Con el SDK de iOS 27 es obligatorio: sin él la app se cierra nada más abrirse.
 
 ## Estructura
 
@@ -32,7 +44,11 @@ npx tsc --noEmit && npx expo lint
 - `src/theme.ts`: colores (azul para agua, ámbar para polvo)
 - `languages/`: nombre de la app traducido para iOS y Android
 - `scripts/generate-icons.mjs`: genera el icono, el splash y el favicon
-- `docs/privacy.html`: política de privacidad (para GitHub Pages)
+- `plugins/withSceneDelegate.js`: config plugin que activa `ExpoAppSceneDelegate` (UIScene)
+- `__tests__/`: tests de textos, sonidos y flujos de la pantalla
+- `docs/index.html` y `docs/privacy.html`: soporte y política de privacidad (para GitHub Pages)
+- `fastlane/metadata/` y `fastlane/screenshots/`: ficha de App Store en inglés y español
+- `docs/appstore/README.md`: lista de pasos para publicar en App Store
 
 ## Publicación
 

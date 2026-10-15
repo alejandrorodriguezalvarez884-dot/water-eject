@@ -3,7 +3,7 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import * as Haptics from 'expo-haptics';
 import { LinearGradient } from 'expo-linear-gradient';
 import { StatusBar } from 'expo-status-bar';
-import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaProvider, SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { CleanButton } from './src/components/CleanButton';
 import { SpeakerIcon, VibrateIcon } from './src/components/Icons';
@@ -12,7 +12,7 @@ import { TargetSelector } from './src/components/TargetSelector';
 import { Tips } from './src/components/Tips';
 import { t } from './src/i18n';
 import { TARGET_PROGRAMS, type ProgramId, type TargetId } from './src/programs';
-import { accents, colors } from './src/theme';
+import { accents, colors, fontScale } from './src/theme';
 import { useCleaner } from './src/useCleaner';
 
 const tap = () => Haptics.selectionAsync().catch(() => {});
@@ -37,6 +37,7 @@ function Main() {
   const program = programByTarget[target];
   const cleaner = useCleaner(program, vibrate);
   const accent = accents[target];
+  const insets = useSafeAreaInsets();
 
   const selectTarget = (next: TargetId) => {
     if (next === target) return;
@@ -67,8 +68,12 @@ function Main() {
         : t.tapToStart;
 
   return (
-    <SafeAreaView style={styles.safe}>
-      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+    // The bottom inset goes on the scroll content so it scrolls under the home indicator instead of being cut off.
+    <SafeAreaView style={styles.safe} edges={['top', 'left', 'right']}>
+      <ScrollView
+        contentContainerStyle={[styles.content, { paddingBottom: styles.content.paddingBottom + insets.bottom }]}
+        showsVerticalScrollIndicator={false}
+      >
         <View style={styles.header}>
           <LinearGradient
             colors={['#1B2F6B', colors.backgroundBottom]}
@@ -79,8 +84,12 @@ function Main() {
             <SpeakerIcon size={26} color={colors.white} innerWave={accents.water.from} outerWave={accents.dust.to} />
           </LinearGradient>
           <View style={styles.headerText}>
-            <Text style={styles.title}>{t.title}</Text>
-            <Text style={styles.subtitle}>{t.subtitle}</Text>
+            <Text style={styles.title} maxFontSizeMultiplier={fontScale.heading}>
+              {t.title}
+            </Text>
+            <Text style={styles.subtitle} maxFontSizeMultiplier={fontScale.heading}>
+              {t.subtitle}
+            </Text>
           </View>
           <Pressable
             onPress={() => {
@@ -113,6 +122,7 @@ function Main() {
         <Text
           style={[styles.status, cleaner.finished && styles.statusDone, cleaner.error && styles.statusError]}
           accessibilityLiveRegion="polite"
+          maxFontSizeMultiplier={fontScale.body}
         >
           {statusText}
         </Text>
@@ -127,7 +137,9 @@ function Main() {
 
         <Tips title={t.tipsTitle} tips={t.targets[target].tips} accent={accent} />
 
-        <Text style={styles.disclaimer}>{t.disclaimer}</Text>
+        <Text style={styles.disclaimer} maxFontSizeMultiplier={fontScale.body}>
+          {t.disclaimer}
+        </Text>
       </ScrollView>
     </SafeAreaView>
   );

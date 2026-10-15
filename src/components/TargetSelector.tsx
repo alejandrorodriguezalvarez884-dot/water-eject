@@ -3,7 +3,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 
 import { t } from '../i18n';
 import { TARGETS, type TargetId } from '../programs';
-import { accents, colors } from '../theme';
+import { accents, colors, fontScale } from '../theme';
 import { TargetIcon } from './Icons';
 
 type Props = {
@@ -24,8 +24,16 @@ export function TargetSelector({ value, onChange, disabled }: Props) {
               <TargetIcon target={target} size={24} color={selected ? colors.white : accent.from} />
             </View>
             <View style={styles.texts}>
-              <Text style={styles.label}>{t.targets[target].label}</Text>
-              <Text style={[styles.caption, selected && styles.captionSelected]} numberOfLines={1}>
+              <Text style={styles.label} maxFontSizeMultiplier={fontScale.heading}>
+                {t.targets[target].label}
+              </Text>
+              <Text
+                style={[styles.caption, selected && styles.captionSelected]}
+                numberOfLines={1}
+                adjustsFontSizeToFit
+                minimumFontScale={0.7}
+                maxFontSizeMultiplier={fontScale.heading}
+              >
                 {t.targets[target].caption}
               </Text>
             </View>

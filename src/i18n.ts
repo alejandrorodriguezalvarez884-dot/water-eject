@@ -56,7 +56,7 @@ const es: Strings = {
     },
   },
   programs: {
-    tone: { label: 'Tono', description: 'Tono continuo de 165 Hz, el mismo que usa el Apple Watch.' },
+    tone: { label: 'Tono', description: 'Tono grave y continuo de 165 Hz que hace vibrar la membrana del altavoz.' },
     pulse: { label: 'Pulsos', description: 'Ráfagas de 165 Hz. Las pausas ayudan a soltar gotas pegadas.' },
     sweep: { label: 'Barrido', description: 'Recorre de 100 a 300 Hz para dar con la resonancia de tu altavoz.' },
     shake: { label: 'Sacudida', description: 'Golpes graves y secos que hacen vibrar la rejilla con fuerza.' },
@@ -103,7 +103,7 @@ const en: Strings = {
     },
   },
   programs: {
-    tone: { label: 'Tone', description: 'Steady 165 Hz tone, the same one the Apple Watch uses.' },
+    tone: { label: 'Tone', description: 'Steady, low 165 Hz tone that makes the speaker membrane vibrate.' },
     pulse: { label: 'Pulses', description: '165 Hz bursts. The pauses help shake off stuck droplets.' },
     sweep: { label: 'Sweep', description: 'Sweeps 100 to 300 Hz to hit your speaker’s resonance.' },
     shake: { label: 'Shake', description: 'Short, punchy bass hits that rattle the grille hard.' },
