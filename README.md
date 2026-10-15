@@ -37,3 +37,18 @@ npx tsc --noEmit && npx expo lint
 ## Publicación
 
 Las builds se compilan en la nube con EAS (`npx eas-cli@latest build`), así que no hace falta un Mac para iOS. El identificador del paquete es `com.alejandrorodriguez.speakercleaner`; cámbialo en `app.json` antes de la primera build si quieres otro.
+
+## Builds
+
+Los perfiles están en `eas.json`: `development` (development client, instalación interna), `preview` (APK de Android para instalar a mano) y `production` (tiendas; EAS sube el número de build solo en cada build).
+
+```bash
+npx eas-cli@latest login
+npx eas-cli@latest build --profile preview --platform android      # APK de prueba
+npx eas-cli@latest build --profile production --platform android   # AAB para Google Play
+npx eas-cli@latest build --profile production --platform ios       # IPA para App Store / TestFlight
+npx eas-cli@latest submit --platform android --latest
+npx eas-cli@latest submit --platform ios --latest
+```
+
+La primera build de cada plataforma pide crear el proyecto en EAS y las credenciales (keystore de Android, certificados de Apple); deja que EAS las gestione. Para iOS hace falta una cuenta de Apple Developer. El perfil `development` necesita antes `npx expo install expo-dev-client`; después `npx expo start` abre la development build en vez de Expo Go.
