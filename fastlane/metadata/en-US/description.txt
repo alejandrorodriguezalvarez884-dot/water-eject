@@ -1,0 +1,24 @@
+Speaker Cleaner plays low-frequency sounds that make your phone's speaker vibrate. That vibration can help push out water droplets after a splash and shake loose surface dust from the speaker grille.
+
+WATER MODE
+• Tone: a steady 165 Hz tone.
+• Pulses: 165 Hz bursts with short pauses that help release stuck droplets.
+• Sweep: moves between 100 and 300 Hz to find your speaker's resonance.
+
+DUST MODE
+• Shake: short, punchy bass hits that rattle the grille.
+• Wide sweep: moves between 60 and 1500 Hz to reach the whole grille.
+
+HOW TO USE IT
+1. Turn the volume all the way up.
+2. Hold the phone with the speaker facing down.
+3. Tap Start. Each session lasts 30 seconds; repeat 2 or 3 times if needed.
+
+FEATURES
+• Optional vibration while the sound plays.
+• Plays even with the silent switch on and keeps the screen awake during a session.
+• Works offline. No account, no ads, no tracking and no data collected.
+• Available in English and Spanish.
+
+PLEASE NOTE
+Speaker Cleaner can help with small amounts of water after a splash and with loose surface dust. It does not repair liquid damage, it does not dry the inside of your phone and it does not replace a physical clean. If your phone was submerged or still sounds muffled after a few sessions, let it dry and contact the manufacturer or an authorized service provider. Never insert pins, toothpicks or other objects into the speaker grille.
