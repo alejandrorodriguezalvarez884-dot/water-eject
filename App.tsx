@@ -1,95 +1,131 @@
 import { useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Switch, Text, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import * as Haptics from 'expo-haptics';
+import { LinearGradient } from 'expo-linear-gradient';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 
-import { EjectButton } from './src/EjectButton';
+import { CleanButton } from './src/components/CleanButton';
+import { SpeakerIcon, VibrateIcon } from './src/components/Icons';
+import { ProgramPicker } from './src/components/ProgramPicker';
+import { TargetSelector } from './src/components/TargetSelector';
+import { Tips } from './src/components/Tips';
 import { t } from './src/i18n';
-import { MODES, type ModeId } from './src/modes';
-import { colors } from './src/theme';
-import { useWaterEject } from './src/useWaterEject';
+import { TARGET_PROGRAMS, type ProgramId, type TargetId } from './src/programs';
+import { accents, colors } from './src/theme';
+import { useCleaner } from './src/useCleaner';
+
+const tap = () => Haptics.selectionAsync().catch(() => {});
 
 export default function App() {
   return (
     <SafeAreaProvider>
       <StatusBar style="light" />
+      <LinearGradient colors={[colors.backgroundTop, colors.backgroundBottom]} style={StyleSheet.absoluteFill} />
       <Main />
     </SafeAreaProvider>
   );
 }
 
 function Main() {
-  const [mode, setMode] = useState<ModeId>('tone');
+  const [target, setTarget] = useState<TargetId>('water');
+  const [programByTarget, setProgramByTarget] = useState<Record<TargetId, ProgramId>>({
+    water: 'tone',
+    dust: 'shake',
+  });
   const [vibrate, setVibrate] = useState(true);
-  const eject = useWaterEject(mode, vibrate);
+  const program = programByTarget[target];
+  const cleaner = useCleaner(program, vibrate);
+  const accent = accents[target];
 
-  const statusText = eject.error
+  const selectTarget = (next: TargetId) => {
+    if (next === target) return;
+    tap();
+    cleaner.reset();
+    setTarget(next);
+  };
+
+  const selectProgram = (next: ProgramId) => {
+    if (next === program) return;
+    tap();
+    cleaner.reset();
+    setProgramByTarget((prev) => ({ ...prev, [target]: next }));
+  };
+
+  const toggleRun = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch(() => {});
+    if (cleaner.running) cleaner.stop();
+    else cleaner.start();
+  };
+
+  const statusText = cleaner.error
     ? t.playError
-    : eject.running
-      ? t.tapToStop
-      : eject.finished
-        ? t.done
+    : cleaner.running
+      ? t.targets[target].running
+      : cleaner.finished
+        ? t.targets[target].done
         : t.tapToStart;
 
   return (
     <SafeAreaView style={styles.safe}>
-      <ScrollView contentContainerStyle={styles.content}>
-        <Text style={styles.title}>{t.title}</Text>
-        <Text style={styles.subtitle}>{t.subtitle}</Text>
-
-        <View style={styles.segmented}>
-          {MODES.map(({ id }) => {
-            const selected = id === mode;
-            return (
-              <Pressable
-                key={id}
-                onPress={() => setMode(id)}
-                disabled={eject.running}
-                accessibilityRole="button"
-                accessibilityState={{ selected, disabled: eject.running }}
-                style={[styles.segment, selected && styles.segmentSelected, eject.running && !selected && styles.dimmed]}
-              >
-                <Text style={[styles.segmentText, selected && styles.segmentTextSelected]}>{t.modes[id].label}</Text>
-              </Pressable>
-            );
-          })}
+      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+        <View style={styles.header}>
+          <LinearGradient
+            colors={['#1B2F6B', colors.backgroundBottom]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.logo}
+          >
+            <SpeakerIcon size={26} color={colors.white} innerWave={accents.water.from} outerWave={accents.dust.to} />
+          </LinearGradient>
+          <View style={styles.headerText}>
+            <Text style={styles.title}>{t.title}</Text>
+            <Text style={styles.subtitle}>{t.subtitle}</Text>
+          </View>
+          <Pressable
+            onPress={() => {
+              tap();
+              setVibrate((v) => !v);
+            }}
+            accessibilityRole="switch"
+            accessibilityState={{ checked: vibrate }}
+            accessibilityLabel={vibrate ? t.vibrationOn : t.vibrationOff}
+            style={[styles.iconButton, vibrate && { backgroundColor: accent.soft, borderColor: accent.from }]}
+          >
+            <VibrateIcon size={20} color={vibrate ? accent.from : colors.textFaint} />
+          </Pressable>
         </View>
-        <Text style={styles.modeDescription}>{t.modes[mode].description}</Text>
 
-        <EjectButton
-          running={eject.running}
-          onPress={eject.running ? eject.stop : eject.start}
-          accessibilityLabel={eject.running ? t.tapToStop : t.tapToStart}
+        <TargetSelector value={target} onChange={selectTarget} disabled={cleaner.running} />
+
+        <CleanButton
+          target={target}
+          running={cleaner.running}
+          finished={cleaner.finished}
+          progress={cleaner.progress}
+          remaining={cleaner.remaining}
+          onPress={toggleRun}
+          startLabel={t.start}
+          secondsLabel={t.seconds}
+          accessibilityLabel={cleaner.running ? t.tapToStop : t.start}
         />
 
-        <View style={styles.progressTrack}>
-          <View style={[styles.progressFill, { width: `${eject.progress * 100}%` }]} />
-        </View>
         <Text
-          style={[styles.status, eject.finished && styles.statusDone, eject.error && styles.statusError]}
+          style={[styles.status, cleaner.finished && styles.statusDone, cleaner.error && styles.statusError]}
           accessibilityLiveRegion="polite"
         >
-          {eject.running ? `${eject.remaining} s · ${statusText}` : statusText}
+          {statusText}
         </Text>
 
-        <View style={styles.row}>
-          <Text style={styles.rowLabel}>{t.vibration}</Text>
-          <Switch
-            value={vibrate}
-            onValueChange={setVibrate}
-            trackColor={{ false: colors.border, true: colors.accent }}
-            thumbColor={colors.white}
-          />
-        </View>
+        <ProgramPicker
+          programs={TARGET_PROGRAMS[target]}
+          value={program}
+          onChange={selectProgram}
+          disabled={cleaner.running}
+          accent={accent}
+        />
 
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>{t.tipsTitle}</Text>
-          {t.tips.map((tip, i) => (
-            <Text key={i} style={styles.tip}>
-              {i + 1}. {tip}
-            </Text>
-          ))}
-        </View>
+        <Tips title={t.tipsTitle} tips={t.targets[target].tips} accent={accent} />
 
         <Text style={styles.disclaimer}>{t.disclaimer}</Text>
       </ScrollView>
@@ -100,77 +136,60 @@ function Main() {
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: colors.background,
   },
   content: {
     alignItems: 'center',
     paddingHorizontal: 20,
-    paddingTop: 24,
+    paddingTop: 12,
     paddingBottom: 32,
+    gap: 20,
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'stretch',
+    gap: 12,
+  },
+  logo: {
+    width: 44,
+    height: 44,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: colors.surfaceBorder,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  headerText: {
+    flex: 1,
   },
   title: {
     color: colors.text,
-    fontSize: 30,
+    fontSize: 22,
     fontWeight: '800',
+    letterSpacing: -0.3,
   },
   subtitle: {
     color: colors.textMuted,
-    fontSize: 15,
-    textAlign: 'center',
-    marginTop: 6,
-  },
-  segmented: {
-    flexDirection: 'row',
-    backgroundColor: colors.surface,
-    borderRadius: 12,
-    padding: 4,
-    marginTop: 24,
-    alignSelf: 'stretch',
-  },
-  segment: {
-    flex: 1,
-    paddingVertical: 10,
-    borderRadius: 9,
-    alignItems: 'center',
-  },
-  segmentSelected: {
-    backgroundColor: colors.accent,
-  },
-  segmentText: {
-    color: colors.textMuted,
-    fontSize: 15,
-    fontWeight: '600',
-  },
-  segmentTextSelected: {
-    color: colors.white,
-  },
-  dimmed: {
-    opacity: 0.4,
-  },
-  modeDescription: {
-    color: colors.textMuted,
     fontSize: 13,
-    textAlign: 'center',
-    marginTop: 10,
-    minHeight: 36,
+    marginTop: 1,
   },
-  progressTrack: {
-    alignSelf: 'stretch',
-    height: 6,
-    borderRadius: 3,
+  iconButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    alignItems: 'center',
+    justifyContent: 'center',
     backgroundColor: colors.surface,
-    overflow: 'hidden',
-  },
-  progressFill: {
-    height: '100%',
-    backgroundColor: colors.accent,
+    borderWidth: 1,
+    borderColor: colors.surfaceBorder,
   },
   status: {
     color: colors.text,
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: '700',
     textAlign: 'center',
-    marginTop: 12,
+    marginTop: -20,
+    minHeight: 22,
   },
   statusDone: {
     color: colors.success,
@@ -178,44 +197,11 @@ const styles = StyleSheet.create({
   statusError: {
     color: colors.error,
   },
-  row: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    alignSelf: 'stretch',
-    backgroundColor: colors.surface,
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    marginTop: 24,
-  },
-  rowLabel: {
-    color: colors.text,
-    fontSize: 16,
-  },
-  card: {
-    alignSelf: 'stretch',
-    backgroundColor: colors.surface,
-    borderRadius: 12,
-    padding: 16,
-    marginTop: 12,
-  },
-  cardTitle: {
-    color: colors.text,
-    fontSize: 16,
-    fontWeight: '700',
-    marginBottom: 8,
-  },
-  tip: {
-    color: colors.textMuted,
-    fontSize: 14,
-    lineHeight: 22,
-  },
   disclaimer: {
-    color: colors.textMuted,
+    color: colors.textFaint,
     fontSize: 12,
+    lineHeight: 17,
     textAlign: 'center',
-    marginTop: 20,
-    opacity: 0.8,
+    paddingHorizontal: 8,
   },
 });

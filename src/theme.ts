@@ -1,12 +1,27 @@
+import type { TargetId } from './programs';
+
 export const colors = {
-  background: '#061A2E',
-  surface: '#0D2A45',
-  border: '#1B3F61',
-  accent: '#1EA7FF',
-  accentDark: '#0B6FB0',
-  text: '#EAF4FF',
-  textMuted: '#8FB0CC',
+  backgroundTop: '#0E1A3A',
+  backgroundBottom: '#050A18',
+  surface: 'rgba(255,255,255,0.06)',
+  surfaceBorder: 'rgba(255,255,255,0.10)',
+  track: 'rgba(255,255,255,0.08)',
+  text: '#F1F5FF',
+  textMuted: '#9AA8C7',
+  textFaint: '#66738F',
   success: '#4ADE80',
   error: '#F87171',
   white: '#FFFFFF',
+};
+
+export type Accent = {
+  from: string;
+  to: string;
+  glow: string;
+  soft: string;
+};
+
+export const accents: Record<TargetId, Accent> = {
+  water: { from: '#38BDF8', to: '#2563EB', glow: '#38BDF8', soft: 'rgba(56,189,248,0.16)' },
+  dust: { from: '#FCD34D', to: '#F97316', glow: '#FB923C', soft: 'rgba(251,146,60,0.16)' },
 };

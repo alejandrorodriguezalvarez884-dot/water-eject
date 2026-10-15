@@ -1,0 +1,8 @@
+{
+  "ios": {
+    "CFBundleDisplayName": "Speaker Cleaner"
+  },
+  "android": {
+    "app_name": "Speaker Cleaner"
+  }
+}

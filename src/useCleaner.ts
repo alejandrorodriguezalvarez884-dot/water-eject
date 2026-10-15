@@ -1,21 +1,24 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { AppState, Vibration } from 'react-native';
 import { setAudioModeAsync, useAudioPlayer, useAudioPlayerStatus } from 'expo-audio';
+import * as Haptics from 'expo-haptics';
 import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
 
-import { DURATION_S, MODES, type ModeId } from './modes';
+import { DURATION_S, PROGRAM_SOURCES, type ProgramId } from './programs';
 
-const KEEP_AWAKE_TAG = 'water-eject';
+const KEEP_AWAKE_TAG = 'speaker-cleaner';
 const VIBRATION_INTERVAL_MS = 900;
 const VIBRATION_MS = 500;
 
-export function useWaterEject(mode: ModeId, vibrate: boolean) {
+export function useCleaner(program: ProgramId, vibrate: boolean) {
   const players = {
-    tone: useAudioPlayer(MODES[0].source),
-    pulse: useAudioPlayer(MODES[1].source),
-    sweep: useAudioPlayer(MODES[2].source),
+    tone: useAudioPlayer(PROGRAM_SOURCES.tone),
+    pulse: useAudioPlayer(PROGRAM_SOURCES.pulse),
+    sweep: useAudioPlayer(PROGRAM_SOURCES.sweep),
+    shake: useAudioPlayer(PROGRAM_SOURCES.shake),
+    wideSweep: useAudioPlayer(PROGRAM_SOURCES.wideSweep),
   };
-  const player = players[mode];
+  const player = players[program];
   const status = useAudioPlayerStatus(player);
 
   const [running, setRunning] = useState(false);
@@ -45,6 +48,11 @@ export function useWaterEject(mode: ModeId, vibrate: boolean) {
     setRunning(true);
   }, [player]);
 
+  const reset = useCallback(() => {
+    setFinished(false);
+    setElapsed(0);
+  }, []);
+
   // Drive progress from wall-clock time so the UI never stalls on a late status update.
   useEffect(() => {
     if (!active) return;
@@ -52,12 +60,13 @@ export function useWaterEject(mode: ModeId, vibrate: boolean) {
       const secs = (Date.now() - startedAt.current) / 1000;
       if (secs >= DURATION_S) {
         stop();
-        setElapsed(DURATION_S); // keep the bar full after a completed run
+        setElapsed(DURATION_S); // keep the ring full after a completed run
         setFinished(true);
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
       } else {
         setElapsed(secs);
       }
-    }, 200);
+    }, 100);
     return () => clearInterval(id);
   }, [active, stop]);
 
@@ -96,5 +105,6 @@ export function useWaterEject(mode: ModeId, vibrate: boolean) {
     error: status.error,
     start,
     stop,
+    reset,
   };
 }

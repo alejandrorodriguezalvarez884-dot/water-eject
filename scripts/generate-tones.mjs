@@ -12,13 +12,15 @@ const BASE_HZ = 165;
 
 const outDir = join(dirname(fileURLToPath(import.meta.url)), '..', 'assets', 'sounds');
 
-// Each generator returns { freq, gain } for time t (seconds).
+// Each generator returns { freq, gain, drive? } for time t (seconds).
+// drive > 0 soft-clips the sine: more harmonics, so tiny phone speakers move harder.
 const tones = {
+  // --- Water ---
   // Steady 165 Hz, the frequency the Apple Watch Water Lock uses.
-  'tone-165': () => ({ freq: BASE_HZ, gain: 1 }),
+  'water-tone': () => ({ freq: BASE_HZ, gain: 1 }),
 
   // 165 Hz bursts: 0.6 s on, 0.25 s off. The repeated push/stop helps break surface tension.
-  'pulse-165': (t) => {
+  'water-pulse': (t) => {
     const period = 0.85;
     const on = 0.6;
     const pos = t % period;
@@ -29,11 +31,32 @@ const tones = {
   },
 
   // Logarithmic sweep 100 -> 300 -> 100 Hz every 4 s, to hit the speaker's resonance whatever the model.
-  'sweep': (t) => {
+  'water-sweep': (t) => {
     const cycle = 4;
     const pos = (t % cycle) / cycle;
     const x = pos < 0.5 ? pos * 2 : (1 - pos) * 2;
     return { freq: 100 * Math.pow(3, x), gain: 1 };
+  },
+
+  // --- Dust ---
+  // Short, hard low-frequency jolts alternating 90 / 140 Hz: maximum cone excursion to shake particles loose.
+  'dust-shake': (t) => {
+    const period = 0.45;
+    const on = 0.3;
+    const pos = t % period;
+    const ramp = 0.008;
+    let gain = 0;
+    if (pos < on) gain = Math.min(1, pos / ramp, (on - pos) / ramp);
+    const freq = Math.floor(t / period) % 2 === 0 ? 90 : 140;
+    return { freq, gain, drive: 2.5 };
+  },
+
+  // Wide logarithmic sweep 60 Hz -> 1.5 kHz -> 60 Hz every 6 s, so every part of the grille vibrates at some point.
+  'dust-sweep': (t) => {
+    const cycle = 6;
+    const pos = (t % cycle) / cycle;
+    const x = pos < 0.5 ? pos * 2 : (1 - pos) * 2;
+    return { freq: 60 * Math.pow(25, x), gain: 1 };
   },
 };
 
@@ -43,9 +66,10 @@ function render(gen) {
   let phase = 0;
   for (let i = 0; i < n; i++) {
     const t = i / SAMPLE_RATE;
-    const { freq, gain } = gen(t);
+    const { freq, gain, drive = 0 } = gen(t);
     const fade = Math.min(1, t / FADE_S, (DURATION_S - t) / FADE_S);
-    const sample = Math.sin(phase) * AMPLITUDE * gain * fade;
+    const wave = drive > 0 ? Math.tanh(drive * Math.sin(phase)) / Math.tanh(drive) : Math.sin(phase);
+    const sample = wave * AMPLITUDE * gain * fade;
     pcm.writeInt16LE(Math.round(sample * 32767), i * 2);
     phase = (phase + (2 * Math.PI * freq) / SAMPLE_RATE) % (2 * Math.PI);
   }

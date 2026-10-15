@@ -1,0 +1,8 @@
+{
+  "ios": {
+    "CFBundleDisplayName": "Limpiar Altavoz"
+  },
+  "android": {
+    "app_name": "Limpiar Altavoz"
+  }
+}
