@@ -11,6 +11,7 @@
       "supportsTablet": false,
       "bundleIdentifier": "com.alejandrorodriguez.speakercleaner",
       "buildNumber": "1",
+      "appleTeamId": "J44H9U6HLW",
       "infoPlist": {
         "CFBundleLocalizations": [
           "en",

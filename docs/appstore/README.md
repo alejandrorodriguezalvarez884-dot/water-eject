@@ -26,7 +26,7 @@ Las capturas se sacaron del simulador iPhone 18 Pro (1206×2622) y se escalaron 
 2. **Publicar las páginas de soporte y privacidad.** En GitHub → Settings → Pages, elige la rama `main` y la carpeta `/docs`. Las URL quedan así (son las que ya están en `fastlane/metadata`):
    - Soporte: `https://alejandrorodriguezalvarez884-dot.github.io/water-eject/`
    - Privacidad: `https://alejandrorodriguezalvarez884-dot.github.io/water-eject/privacy.html`
-3. **Crear la app en App Store Connect** (Apps → + → Nueva app): plataforma iOS, idioma principal Inglés (EE. UU.), bundle ID `com.alejandrorodriguez.speakercleaner`, SKU p. ej. `speaker-cleaner`. Si el nombre `Speaker Cleaner: Water & Dust` ya está cogido, cámbialo en `fastlane/metadata/*/name.txt` (máx. 30 caracteres).
+3. **Crear la app en App Store Connect** (Apps → + → Nueva app): plataforma iOS, idioma principal Inglés (EE. UU.), bundle ID `com.alejandrorodriguez.speakercleaner`, SKU p. ej. `speaker-cleaner`. `Speaker Cleaner: Water & Dust` ya estaba cogido, así que la ficha se llama `PulseTone: Speaker Cleaner` (`PulseTone: Limpiar Altavoz` en español); en la pantalla de inicio sigue apareciendo «Speaker Cleaner» / «Limpiar Altavoz».
 4. **Compilar y subir el binario.** Dos caminos:
    - **EAS (recomendado, ya configurado en `eas.json`):**
      ```bash
