@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View } from 'react-native';
 
-import { type Accent, colors } from '../theme';
+import { type Accent, colors, fontScale } from '../theme';
 
 type Props = {
   title: string;
@@ -11,13 +11,19 @@ type Props = {
 export function Tips({ title, tips, accent }: Props) {
   return (
     <View style={styles.card}>
-      <Text style={styles.title}>{title}</Text>
+      <Text style={styles.title} maxFontSizeMultiplier={fontScale.body}>
+        {title}
+      </Text>
       {tips.map((tip, i) => (
         <View key={i} style={styles.row}>
           <View style={[styles.badge, { backgroundColor: accent.soft }]}>
-            <Text style={[styles.badgeText, { color: accent.from }]}>{i + 1}</Text>
+            <Text style={[styles.badgeText, { color: accent.from }]} maxFontSizeMultiplier={fontScale.fixed}>
+              {i + 1}
+            </Text>
           </View>
-          <Text style={styles.tip}>{tip}</Text>
+          <Text style={styles.tip} maxFontSizeMultiplier={fontScale.body}>
+            {tip}
+          </Text>
         </View>
       ))}
     </View>

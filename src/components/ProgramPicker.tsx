@@ -2,7 +2,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { t } from '../i18n';
 import type { ProgramId } from '../programs';
-import { type Accent, colors } from '../theme';
+import { type Accent, colors, fontScale } from '../theme';
 
 type Props = {
   programs: ProgramId[];
@@ -32,12 +32,19 @@ export function ProgramPicker({ programs, value, onChange, disabled, accent }: P
                 disabled && !selected && styles.dimmed,
               ]}
             >
-              <Text style={[styles.chipText, selected && styles.chipTextSelected]}>{t.programs[program].label}</Text>
+              <Text
+                style={[styles.chipText, selected && styles.chipTextSelected]}
+                maxFontSizeMultiplier={fontScale.heading}
+              >
+                {t.programs[program].label}
+              </Text>
             </Pressable>
           );
         })}
       </View>
-      <Text style={styles.description}>{t.programs[value].description}</Text>
+      <Text style={styles.description} maxFontSizeMultiplier={fontScale.body}>
+        {t.programs[value].description}
+      </Text>
     </View>
   );
 }

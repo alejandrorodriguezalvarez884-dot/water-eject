@@ -30,7 +30,7 @@ export function useCleaner(program: ProgramId, vibrate: boolean) {
 
   useEffect(() => {
     // Play even with the iPhone silent switch on, and pause other apps' audio.
-    setAudioModeAsync({ playsInSilentMode: true, interruptionMode: 'doNotMix' });
+    setAudioModeAsync({ playsInSilentMode: true, interruptionMode: 'doNotMix' }).catch(() => {});
   }, []);
 
   const stop = useCallback(() => {
@@ -42,7 +42,8 @@ export function useCleaner(program: ProgramId, vibrate: boolean) {
   const start = useCallback(async () => {
     setFinished(false);
     setElapsed(0);
-    await player.seekTo(0);
+    // A failed rewind (e.g. the file is still loading) shouldn't block the run; the file starts at 0 anyway.
+    await player.seekTo(0).catch(() => {});
     player.play();
     startedAt.current = Date.now();
     setRunning(true);

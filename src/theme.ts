@@ -14,6 +14,14 @@ export const colors = {
   white: '#FFFFFF',
 };
 
+// Caps for Dynamic Type so the largest accessibility sizes don't break words mid-line.
+// fixed: text inside fixed-size shapes; heading: short labels in tight rows; body: text that wraps freely.
+export const fontScale = {
+  fixed: 1.15,
+  heading: 1.35,
+  body: 2,
+};
+
 export type Accent = {
   from: string;
   to: string;

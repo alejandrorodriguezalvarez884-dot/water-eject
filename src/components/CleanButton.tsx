@@ -4,7 +4,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import Svg, { Circle, Defs, LinearGradient as SvgGradient, RadialGradient, Stop } from 'react-native-svg';
 
 import type { TargetId } from '../programs';
-import { accents, colors } from '../theme';
+import { accents, colors, fontScale } from '../theme';
 import { CheckIcon, TargetIcon } from './Icons';
 
 const STAGE = 316;
@@ -158,15 +158,21 @@ export function CleanButton({
             />
             {running ? (
               <>
-                <Text style={styles.count}>{remaining}</Text>
-                <Text style={styles.unit}>{secondsLabel}</Text>
+                <Text style={styles.count} allowFontScaling={false}>
+                  {remaining}
+                </Text>
+                <Text style={styles.unit} maxFontSizeMultiplier={fontScale.fixed}>
+                  {secondsLabel}
+                </Text>
               </>
             ) : finished ? (
               <CheckIcon size={76} color={colors.white} />
             ) : (
               <>
                 <TargetIcon target={target} size={64} color={colors.white} />
-                <Text style={styles.startLabel}>{startLabel}</Text>
+                <Text style={styles.startLabel} maxFontSizeMultiplier={fontScale.fixed}>
+                  {startLabel}
+                </Text>
               </>
             )}
           </LinearGradient>
