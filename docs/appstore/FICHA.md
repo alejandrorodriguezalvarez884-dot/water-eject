@@ -27,7 +27,7 @@ App en App Store Connect: **PulseTone: Speaker Cleaner** (ID 6823346991). Los te
 - **Versión:** cámbiala de `1.0` a **`1.0.0`** (tiene que coincidir con el build).
 - **Copyright:** `2026 Alejandro Rodríguez Álvarez`
 - **Build:** cuando termine de procesarse (10-30 min tras subirlo, te llega un correo), pulsa «Add Build» y elige `1.0.0 (1)`. Cifrado: ya está declarado en el binario (`ITSAppUsesNonExemptEncryption = NO`).
-- **Capturas iPhone 6,9":** arrastra las 4 `*_iphone69.jpg` de `fastlane/screenshots/en-US/` en orden (1_water, 2_running, 3_dust, 4_done). App Store Connect genera el resto de tamaños a partir de estas; si te pide 6,5", usa las `*_iphone65.jpg`.
+- **Capturas iPhone:** App Store Connect pide la ranura «iPhone with Dynamic Island (medium display)», de 1206 × 2622: arrastra las 4 `*_iphone63.jpg` de `fastlane/screenshots/en-US/` en orden (1_water, 2_running, 3_dust, 4_done). Las `*_iphone69.jpg` (6,9") y `*_iphone65.jpg` (6,5") son para otras ranuras si te las piden.
 - **Información para la revisión (App Review Information):** sin inicio de sesión (desmarca «Sign-in required»), tu nombre, teléfono y correo de contacto, y en Notas:
 ```
 Speaker Cleaner plays bundled, pre-generated audio files (low-frequency tones, 30 seconds each). It needs no account, no network access and no permissions. To test: tap the round Start button; a 30-second countdown runs while the selected sound plays. Switch between Water and Dust modes and between programs with the chips under the button. The vibration toggle is the phone icon in the top-right corner. The app does not claim to repair liquid damage; the in-app disclaimer and the description say so.
